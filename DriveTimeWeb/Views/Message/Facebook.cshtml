@@ -1,0 +1,61 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+@{
+    OfficeAddInServerAuth.Models.UserInfo userInfo = ViewBag.UserInfo;
+    OfficeAddInServerAuth.Models.SendMessageResponse messageResponse = ViewBag.MessageResponse;
+}
+
+<h2>Messages</h2>
+<br />
+
+<form>
+    <p>
+    <p>
+        You're now connected!  Click <b>Post Message</b> to send a post a message to your account. You will be automtically logged out after 2 minutes.
+    </p>
+
+    <p>
+        @Html.HiddenFor(m => userInfo.Address)
+        <button formaction="@Url.Content("~/Message/FacebookSendMessageSubmit")">Post Message</button>
+    </p>
+
+</form>
+
+
+<div>
+    @{  if (messageResponse.Status == OfficeAddInServerAuth.Models.SendMessageStatusEnum.Sent)
+        {
+            <p>Successfully posted a message to Facebook!</p>
+        }
+        else if (messageResponse.Status == OfficeAddInServerAuth.Models.SendMessageStatusEnum.Fail)
+        {
+            <p>Your message was NOT sent</p>
+            <p>@messageResponse.StatusMessage</p>
+        }
+    }
+</div>
+
+<a href="@Url.Action("Logout", "FacebookAuth", null, Request.Url.Scheme)"><i class="ms-Icon ms-Icon--x"></i> Disconnect</a>
+
+
+@section scripts {
+    <script>
+(function () {
+    "use strict";
+
+    // The initialize function must be run each time a new page is loaded
+    Office.initialize = function (reason) {
+        //set countown timer to force logout after 2 minutes of inactivity
+        var counter = setInterval(timer, 1000 * 60 * 2); //2 minutes
+        function timer() {
+            location.href = '@Url.Action("Logout", "FacebookAuth", null, Request.Url.Scheme)';
+        }
+    };
+})();
+
+
+    </script>
+}

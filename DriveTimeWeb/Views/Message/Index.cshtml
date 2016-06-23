@@ -1,0 +1,64 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+@{
+    OfficeAddInServerAuth.Models.UserInfo userInfo = ViewBag.UserInfo;
+    OfficeAddInServerAuth.Models.SendMessageResponse messageResponse = ViewBag.MessageResponse;
+}
+
+<h2>Messages</h2>
+<br />
+
+<form>
+    <p>
+        You're now connected!  Click <b>Send Mail</b> to send a message from your account. You will be automtically logged out after 2 minutes.
+    </p>
+    <a href="~/AppRead/TaskPane/TaskPane.html">DriveTime</a>
+    <p>
+        <b>To:</b> @Html.EditorFor(m => userInfo.Address, new { htmlAttributes = new { style = "Width:350px" } })
+
+        <br />
+
+        <button formaction="@Url.Content("~/Message/SendMessageSubmit")">Send Mail</button>
+    </p>
+
+</form>
+
+
+<div>
+    @{  if (messageResponse.Status == OfficeAddInServerAuth.Models.SendMessageStatusEnum.Sent)
+        {
+        <p>Successfully sent an email to @userInfo.Address!</p>
+        }
+        else if (messageResponse.Status == OfficeAddInServerAuth.Models.SendMessageStatusEnum.Fail)
+        {
+            <p>Your message was NOT sent</p>
+            <p>@messageResponse.StatusMessage</p>
+        }
+    }
+    </div>
+
+<a href="@Url.Action("Logout", "AzureADAuth", null, Request.Url.Scheme)"><i class="ms-Icon ms-Icon--x"></i> Disconnect</a>
+
+
+@section scripts {
+    <script>
+(function () {
+    "use strict";
+    //TODO: Make this work with all the auth providers, not just AzureAD
+
+    // The initialize function must be run each time a new page is loaded
+    Office.initialize = function (reason) {
+        //set countown timer to force logout after 2 minutes of inactivity
+        var counter = setInterval(timer, 1000 * 60 * 2); //2 minutes
+        function timer() {
+            location.href = '@Url.Action("Logout", "AzureADAuth", null, Request.Url.Scheme)';
+        }
+    };
+})();
+
+
+    </script>
+}

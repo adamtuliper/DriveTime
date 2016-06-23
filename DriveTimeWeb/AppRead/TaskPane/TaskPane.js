@@ -179,7 +179,6 @@
         '  <soap:Body>' +
 
         request +
-
         '  </soap:Body>' +
         '</soap:Envelope>';
 
